@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+.loader {
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid red;
+  border-right: 16px solid green;
+  border-bottom: 16px solid black;
+  border-left: 16px solid blue;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+table {
+    border-collapse: collapse;
+    width: 80%;
+}
+th, td {
+    text-align: left;
+    padding: 8px;
+}
+tr:nth-child(even){background-color: #b5b5b5}
+th {
+    background-color: grey;
+    color: black;
+    width: 10%
+}
+.modal {
+    display: block; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+.modal-content {
+    position: relative;
+    margin: auto;
+    width: 5%;
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s
+}
+@-webkit-keyframes animatetop {
+    from {top:-300px; opacity:0}
+    to {top:0; opacity:1}
+}
+@keyframes animatetop {
+    from {top:-300px; opacity:0}
+    to {top:0; opacity:1}
+}
+.modal-body {padding: 2px 16px;}
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+var refreshIntervalId;
+var filename;
+var res;
+var count=0;
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
+ var jqxhr = $.getJSON( "/API/get_DL.cgi?token=" + getParameterByName('token') + "&scan=" + encodeURI(getParameterByName('scan')) + "&device=" + encodeURI(getParameterByName('device') + "&version=" + encodeURI(getParameterByName('version'))), function( data ) {
+  var results = data.results;
+  res = results;
+  var checks = results.checks;
+  if (results.ERROR){
+   document.getElementById("error").textContent = results.ERROR;
+//   alert (results.ERROR);
+  } else {
+   document.getElementById("user").textContent = results.Initial + " " + results.Surname;
+   document.getElementById("IDNo").textContent = results.IDNo;
+   document.getElementById("ValidTo").textContent = results.ValidTo;
+   document.getElementById("VehRestr").textContent = checks.VehRestr;
+   document.getElementById("UserRestr").textContent = checks.UserRestr;
+   if (checks.expired === "false") {
+    document.getElementById("lic_expire").src= '/images/tick.png';
+   }else{
+    document.getElementById("lic_expire").src= '/images/alert.png';
+   }
+   jQuery.each(results.Code, function(i, val) {
+    document.getElementById("Code").append(document.createTextNode(val + " "));
+    document.getElementById("lic_type").src = '/images/pix.png';
+   });
+   document.getElementById("age").textContent = checks.age;
+   if (results.unlock === "false") {
+    document.getElementById("unlock").innerHTML = '<font color="red" size=6>Register for your FREE account on <a href="https://www.npscloud.co.za/register.php">https://www.npscloud.co.za</a><br>Login to <a href="https://www.npscloud.co.za/login.php">https://www.npscloud.co.za</a> and scan the barcode in the NPS-LIC section.</font>';
+   }
+   document.getElementById("appversion").textContent = "#" + getParameterByName('version');
+   filename = checks.filename;
+   document.getElementById("alternative").innerHTML = '<a href = "' + filename + '">No photo?</a>';
+   if (getParameterByName('version') == "0100") {document.getElementById("error").textContent = 'Please update your scanner application to the latest release in Google Play Store';}
+  }
+  })
+  .done(function( data ) {
+   refreshIntervalId = setInterval(findURL, 1000);
+  })
+  .fail(function() {
+   document.getElementById("error").textContent = 'Decryption ERROR occurred. We are busy debugging this known issue affecting 5% of cards scanned please scan a different Drivers Licence Card to test the system in the interim.';
+  })
+  .always(function() {
+    var modal = document.getElementById('myModal');
+    modal.style.display = "none";
+  });
+
+setTimeout(function(){ jqxhr.abort(); }, 30000);
+
+function findURL() {
+ if (count >= 30){
+  jQuery('#loading').append('<br /><strong>Timeout!!</strong>');
+  clearInterval(refreshIntervalId);
+ }
+ $.ajax({
+  url: filename,
+  type: 'GET',
+  dataType: 'text',
+  success: function() {
+   document.getElementById("gender").src= filename;
+   clearInterval(refreshIntervalId);
+   $.ajax({
+    url: "/API/show_photo.cgi?token=" + getParameterByName('token'),
+    type: 'GET',
+    dataType: 'text',
+    success: function() {
+     console.log( filename );
+    }
+   });
+  },
+  error: function() {
+   jQuery('#loading ').append('.');
+   count = count + 1;
+  }
+ })
+}
+</script>
+</head>
+<body bgcolor=#f2f2f2>
+
+<center><a href=""><img src="/images/NPSLogo.png" /></a>
+<div id="unlock"></div>
+<center><h1>Drivers Licence SCAN</h1></center>
+<h4><font color=RED><center><strong><span id="error"></span></strong></center></font></h4>
+
+<hr>
+<center><img id="gender" src="/images/noimage.png"></center>
+<div id="alternative"></div>
+<table border=5>
+  <tr id="display_tr" style="display: none;">
+    <th>Device</th>
+    <td><center><strong><span id="device"></span></strong></center></td>
+  </tr>
+  <tr>
+    <th>Initial Surname</th>
+    <td><center><strong><span id="user"></span></strong></center></td>
+  </tr>
+  <tr>
+    <th>ID Number</th>
+    <td><center><strong><span id="IDNo"></span></strong></center></td>
+  </tr>
+  <tr>
+    <th>Age</th>
+    <td><center><strong><span id="age"></span></strong></center></td>
+  </tr>
+  <tr>
+    <th>Vehicle Restriction</th>
+    <td><center><strong><span id="VehRestr"></span></strong></center></td>
+  </tr>
+  <tr>
+    <th>Driver Restriction</th>
+    <td><center><strong><span id="UserRestr"></span></strong></center></td>
+  </tr>
+  <tr>
+    <th>Licence Type</th>
+    <td><center><span id="Code"></span"><img id="lic_type" src="/images/checking.png"></center></td>
+  </tr>
+  <tr>
+    <th>Expire</th>
+    <td><center><span id="ValidTo"></span><img id="lic_expire" src="/images/checking.png"></center></td>
+  </tr>
+  <tr>
+    <th>Third party Status</th>
+    <td><center><img id="external_image" src="/images/lock.png"></center></td>
+  </tr>
+</table>
+<br>
+<hr>
+<font color="white">
+ <table style="width:30%" bgcolor="red">
+  <tr><td><center><h2>!!! Legal note</h2></center></td></tr>
+  <tr><td bgcolor="red"><center><b>Our new POPI compliant interface will be available soon - NPS Development team.</b></center></td></tr>
+ </table>
+</font>
+<p>Download this app in the <a href="https://play.google.com/store/apps/details?id=com.nptracker.npsaccess.client.android">Google Play Store</a>. Installed version : [<span id="appversion"></span>]</p>
+<center><div id="loading"></div></center>
+<div id="myModal" class="modal">
+  <!-- Modal content -->
+  <div id="myWin" class="modal-content">
+    <div id="spinner" class="loader"></div>
+  </div>
+</div>
+<script>
+var modal = document.getElementById('myModal');
+function showSpinner() {
+        modal.style.display = "block";
+}
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+</script>
+</body>
+</html>

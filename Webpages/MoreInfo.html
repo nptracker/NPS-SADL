@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+.loader {
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid red;
+  border-right: 16px solid green;
+  border-bottom: 16px solid black;
+  border-left: 16px solid blue;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+table {
+    border-collapse: collapse;
+    width: 80%;
+}
+th, td {
+    text-align: left;
+    padding: 8px;
+}
+tr:nth-child(even){background-color: #b5b5b5}
+th {
+    background-color: grey;
+    color: black;
+    width: 10%
+}
+.modal {
+    display: block; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+.modal-content {
+    position: relative;
+    margin: auto;
+    width: 5%;
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s
+}
+@-webkit-keyframes animatetop {
+    from {top:-300px; opacity:0}
+    to {top:0; opacity:1}
+}
+@keyframes animatetop {
+    from {top:-300px; opacity:0}
+    to {top:0; opacity:1}
+}
+.modal-body {padding: 2px 16px;}
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+function getplate() {
+ var a;
+ var tmp = getParameterByName('scan').split("%");
+ if (tmp[1].includes("MVL")){
+  document.getElementById('plate').textContent = tmp[6];
+  document.getElementById('VIN').textContent = tmp[12];
+  document.getElementById('email').innerHTML = '<a href="mailto:info@nptracker.co.za?subject=' + tmp[12] + '">Contact us</a>';
+  document.getElementById('manuf').textContent = tmp[9];
+  document.getElementById('model').textContent = tmp[10];
+  a = tmp[8].split("/");
+  document.getElementById('class').textContent = a[0];
+  a = tmp[11].split("/");
+  document.getElementById('kleur').textContent = a[0];
+  document.getElementById('engine').textContent = tmp[13];
+  document.getElementById('date').textContent = tmp[14];
+  if (tmp[16]) {
+   document.getElementById('device').textContent = tmp[16];
+   document.getElementById('display_tr').style.display = 'table-row';
+  }
+ }else{
+  document.getElementById('plate').textContent = tmp[6];
+  document.getElementById('VIN').textContent = tmp[10];
+  document.getElementById('manuf').textContent = tmp[8];
+  document.getElementById('model').textContent = tmp[9];
+  a = tmp[7].split("/");
+  document.getElementById('class').textContent = a[0];
+  document.getElementById('kleur').textContent = "---";
+  document.getElementById('engine').textContent = tmp[11];
+  document.getElementById('date').textContent = tmp[13];
+  if (tmp[17]) {
+   document.getElementById('device').textContent = tmp[17];
+   document.getElementById('display_tr').style.display = 'table-row';
+  }
+ }
+}
+var jqxhr = $.getJSON( "/API/get_VIN.cgi?token=" + getParameterByName('token') + "&scan=" + encodeURI(getParameterByName('scan')), function( data ) {
+//  console.log( JSON.stringify(data.results) );
+  var results = data.results;
+  var checks = results.checks;
+  if (results.ERROR){
+   alert (results.ERROR);
+  } else {
+   if (results.pic_url) {document.getElementById("vehicle_image").src= results.pic_url;}
+   document.getElementById("manufacturer").textContent = '(' + results.manufacturer + ')';
+   document.getElementById("cmanuf").textContent = results.brand;
+   document.getElementById("year").textContent = results.year;
+   document.getElementById("cengine").textContent = results.engine;
+   document.getElementById("cmodel").textContent = results.model;
+   document.getElementById("nps_image").src= '/images/' + checks.np_tracker + '.png';
+   document.getElementById("external_image").src= '/images/' + checks.external + '.png';
+   document.getElementById("manuf_image").src= '/images/' + checks.manufacturer + '.png';
+   document.getElementById("model_image").src= '/images/' + checks.model + '.png';
+   document.getElementById("color_image").src= '/images/' + checks.colour + '.png';
+   document.getElementById("engine_image").src= '/images/' + checks.engine + '.png';
+   document.getElementById("expire_image").src= '/images/' + checks.expire + '.png';
+   if (results.unlock === "false") {
+    document.getElementById("unlock").innerHTML = '<ul><li><font color="red" size=6>Register for your FREE account on <a href="https://www.npscloud.co.za/register.php">https://www.npscloud.co.za</a></li><br><li>Login to <a href="https://www.npscloud.co.za/login.php">https://www.npscloud.co.za</a> and scan the barcode in the NPS-LIC section to link this scanner to your NPSCLOUD account see picture.</font></li></ul><br><center><a href="http://www.npscloud.co.za/login.php"><img src="/images/scantoken.png" /></a></center>';
+   }
+  }
+  })
+  .done(function( ) {
+  })
+  .fail(function() {
+  })
+  .always(function() {
+    var modal = document.getElementById('myModal');
+    modal.style.display = "none";
+  });
+  setTimeout(function(){ jqxhr.abort(); }, 40000);
+</script>
+
+</head>
+<body onload="getplate()" bgcolor=#f2f2f2>
+
+<center><a href="http://www.nptracker.co.za"><img src="/images/NPSLogo.png" /></a>
+<div id="unlock"></div>
+<center><H1>Licence Disk SCAN</H1></center>
+<hr>
+<table border=5>
+  <tr id="display_tr" style="display: none;">
+    <th>Device</th>
+    <td><center><strong><span id="device"></span></strong></center></td>
+  </tr>
+  <tr>
+    <th>Registration</th>
+    <td><center><strong><span id="plate"></span></strong></center></td>
+  </tr>
+  <tr>
+    <th>Date on disk</th>
+    <td><center><img id="expire_image" src="/images/checking.png"><span id="date"></span"></center></td>
+  </tr>
+  <tr>
+    <th>NP Tracker Status</th>
+    <td><center><img id="nps_image" src="/images/checking.png">&nbsp;<span id="np_tracker" style="display: none"><a href="">View Report</a></span></center></td>
+  </tr>
+  <tr>
+    <th>Third party Status</th>
+    <td><center><img id="external_image" src="/images/checking.png"></center></td>
+  </tr>
+</table>
+<br>
+<img id="vehicle_image" src="/images/noimage.png">
+<center>Spot a error <span id = "email"></span></center>
+<br>
+<table border=5>
+  <tr>
+    <th>&nbsp;</th>
+    <th>Scanned</th>
+    <th>Compare</th>
+    <th>Status</th>
+  </tr>
+  <tr>
+    <th>VIN</th>
+    <td colspan=3><span id = "VIN"></span>&nbsp;<span id = "manufacturer"></span></td>
+  </tr>
+  <tr>
+    <th>Manufacturer</th>
+    <td><span id="manuf"></span></td>
+    <td><span id="cmanuf"></span></td>
+    <td><img id="manuf_image" src="/images/checking.png"></td>
+  </tr>
+  <tr>
+    <th>Model</th>
+    <td><span id="model"></span></td>
+    <td><span id="cmodel"></span></td>
+    <td><img id="model_image" src="/images/checking.png"></td>
+  </tr>
+  <tr>
+    <th>Class</th>
+    <td colspan=3><span id="class"></span></td>
+  </tr>
+  <tr>
+    <th>Year</th>
+    <td colspan=3><span id="year"></span></td>
+  </tr>
+  <tr>
+    <th>Colour</th>
+    <td><span id="kleur"></span></td>
+    <td><span id="ckleur"></span></td>
+    <td><img id="color_image" src="/images/checking.png"></td>
+  </tr>
+  <tr>
+    <th>Engine</th>
+    <td><span id="engine"></span></td>
+    <td><span id="cengine"></span></td>
+    <td><img id="engine_image" src="/images/checking.png"></td>
+  </tr>
+</table>
+<br>
+<hr>
+<font color="white">
+ <table style="width:30%" bgcolor="red">
+  <tr><td><center><h2>!!! Legal note</h2></center></td></tr>
+  <tr><td bgcolor="red"><center><b>While NPS shall endeavor to ensure that all material published on the website is accurate at the time of its publication, it gives no warrantees as to the accuracy of the information. Your use of the information is entirely at your own risk and no liability will arise against NPS resulting from using the information provided on the website.<br><br>Tested against the <strong>NP Tracker</strong> Suspect Vehicle Database <a href="http://www.nptracker.co.za">http://www.nptracker.co.za</a></b></center></td></tr>
+ </table>
+</font>
+<div id="myModal" class="modal">
+  <!-- Modal content -->
+  <div id="myWin" class="modal-content">
+    <div id="spinner" class="loader"></div>
+  </div>
+</div>
+<script>
+var modal = document.getElementById('myModal');
+function showSpinner() {
+        modal.style.display = "block";
+}
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+</script>
+</body>
+</html>

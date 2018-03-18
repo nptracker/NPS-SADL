@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+.loader {
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid red;
+  border-right: 16px solid green;
+  border-bottom: 16px solid black;
+  border-left: 16px solid blue;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+table {
+    border-collapse: collapse;
+    width: 80%;
+}
+th, td {
+    text-align: left;
+    padding: 8px;
+}
+tr:nth-child(even){background-color: #b5b5b5}
+th {
+    background-color: grey;
+    color: black;
+    width: 10%
+}
+.modal {
+    display: block; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+.modal-content {
+    position: relative;
+    margin: auto;
+    width: 5%;
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s
+}
+@-webkit-keyframes animatetop {
+    from {top:-300px; opacity:0}
+    to {top:0; opacity:1}
+}
+@keyframes animatetop {
+    from {top:-300px; opacity:0}
+    to {top:0; opacity:1}
+}
+.modal-body {padding: 2px 16px;}
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+var jqxhr = $.getJSON( "/API/get_ID.cgi?token=" + getParameterByName('token') + "&scan=" + encodeURI(getParameterByName('scan')) + "&device=" + encodeURI(getParameterByName('device')), function( data ) {
+//  console.log( JSON.stringify(data.results) );
+  var results = data.results;
+  var checks = results.checks;
+  if (results.ERROR){
+   alert (results.ERROR);
+  } else {
+   document.getElementById("user").textContent = results.Name + " " + results.Surname;
+   document.getElementById("IDNo").textContent = results.IDNo;
+   document.getElementById("Citizen").textContent = results.Citizen;
+   document.getElementById("IssuedBy").textContent = results.IssuedBy;
+   document.getElementById("Issued").textContent = results.Issued;
+   if (results.Gender === "Male") {
+    document.getElementById("gender").src= '/images/male.png';
+   }else{document.getElementById("gender").src= '/images/female.png';}
+   if (results.EncryptionVersion === "UNSUPORTED") {
+    document.getElementById("gender").src= '/images/error.png';
+   }
+   document.getElementById("age").textContent = checks.age;
+if (results.unlock === "false") {
+document.getElementById("unlock").innerHTML = '<font color="red" size=6>Register for your FREE account on <a href="https://www.npscloud.co.za/register.php">https://www.npscloud.co.za</a><br>Login to <a href="https://www.npscloud.co.za/login.php">https://www.npscloud.co.za</a> and scan the barcode in the NPS-LIC section.</font>';
+}
+  }
+  })
+  .done(function( ) {
+  })
+  .fail(function() {
+  })
+  .always(function() {
+    var modal = document.getElementById('myModal');
+    modal.style.display = "none";
+  });
+setTimeout(function(){ jqxhr.abort(); }, 30000);
+</script>
+
+</head>
+<body bgcolor=#f2f2f2>
+
+<center><a href=""><img src="/images/NPSLogo.png" /></a>
+<div id="unlock"></div>
+<center><h1>ID Card SCAN</h1></center>
+<hr>
+<center><img id="gender" src="/images/noimage.png"></center>
+<table border=5>
+  <tr id="display_tr" style="display: none;">
+    <th>Device</th>
+    <td><center><strong><span id="device"></span></strong></center></td>
+  </tr>
+  <tr>
+    <th>Name Surname</th>
+    <td><center><strong><span id="user"></span></strong></center></td>
+  </tr>
+  <tr>
+    <th>ID Number</th>
+    <td><center><strong><span id="IDNo"></span></strong></center></td>
+  </tr>
+  <tr>
+    <th>Age</th>
+    <td><center><strong><span id="age"></span></strong></center></td>
+  </tr>
+  <tr>
+    <th>Citizen</th>
+    <td><center><strong><span id="Citizen"></span></strong></center></td>
+  </tr>
+  <tr>
+    <th>Issued</th>
+    <td><center><strong><span id="IssuedBy"></span></strong>&nbsp;(<strong><span id="Issued"></span>)</strong></center></td>
+  </tr>
+  <tr>
+    <th>Third party Status</th>
+    <td><center><img id="external_image" src="/images/lock.png"></center></td>
+  </tr>
+</table>
+<br>
+<hr>
+<font color="white">
+ <table style="width:30%" bgcolor="red">
+  <tr><td><center><h2>!!! Legal note</h2></center></td></tr>
+  <tr><td bgcolor="red"><center><b>Ensure you comply to the POPI act.</b></center></td></tr>
+ </table>
+</font>
+<div id="myModal" class="modal">
+  <!-- Modal content -->
+  <div id="myWin" class="modal-content">
+    <div id="spinner" class="loader"></div>
+  </div>
+</div>
+<script>
+var modal = document.getElementById('myModal');
+function showSpinner() {
+        modal.style.display = "block";
+}
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+  <PreferenceCategory android:title="Scanner settings">
+      <EditTextPreference android:title="Scanner identifier"
+                       android:key="scannerID"
+                       android:summary="Please provide a unique scanner name (to identify scanner on NPS-Cloud)"></EditTextPreference>
+      <EditTextPreference android:title="Scanner access token"
+                       android:key="NPS-API"
+                       android:summary="Available FREE from http://www.npscloud.co.za"></EditTextPreference>
+      <EditTextPreference android:title="Scanner counter"
+                      android:key="count"
+                      android:defaultValue="0"
+                      android:editable="false">
+      </EditTextPreference>
+  </PreferenceCategory>
+</PreferenceScreen>

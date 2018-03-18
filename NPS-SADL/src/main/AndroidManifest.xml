@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.nptracker.android.nps.sadl.barcodereader"
+    android:installLocation="auto" >
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-sdk android:minSdkVersion="11" android:targetSdkVersion="22"/>
+    <application
+        android:allowBackup="true"
+        android:fullBackupContent="false"
+        android:hardwareAccelerated="true"
+        android:icon="@drawable/icon"
+        android:label="NPS-SADL (South African Drivers Licence) Scanner"
+        android:supportsRtl = "true"
+        android:theme="@style/Theme.AppCompat" >
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.google.android.gms.vision.DEPENDENCIES"
+            android:value="barcode" />
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="sensorLandscape"
+            android:label="NPS-SADL Demo App" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".BarcodeCaptureActivity"
+            android:screenOrientation="sensorLandscape"
+            android:label="Read Barcode"/>
+        <activity android:name=".MoreInfo"
+            android:label="Enquiry"
+            android:screenOrientation="sensorPortrait"
+            android:stateNotNeeded="true"/>
+        <activity android:name=".TokenActivity"
+            android:label="Enquiry"
+            android:screenOrientation="sensorPortrait"
+            android:stateNotNeeded="true"/>
+        <activity android:name=".MyPreferencesActivity"
+            android:screenOrientation="sensorPortrait"
+            android:theme="@android:style/Theme.NoTitleBar"/>
+    </application>
+</manifest>

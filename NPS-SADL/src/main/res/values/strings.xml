@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ok">OK</string>
+    <string name="permission_camera_rationale">Access to the camera is needed for detection</string>
+    <string name="no_camera_permission">This application cannot run because it does not have the camera permission.  The application will now exit.</string>
+    <string name="low_storage_error">Barcode dependencies cannot be downloaded due to low device storage</string>
+    <string name="title_activity_main">NPS-SADL Barcode Reader Sample</string>
+    <string name="barcode_header">NPS-SADL -South African Drivers Licence- Scanner DEMO App</string>
+    <string name="status_message">If you like and use this app please consider donating to the project at http://www.nptracker.co.za</string>
+    <string name="read_barcode">Scan Barcode</string>
+    <string name="auto_focus">Auto Focus</string>
+    <string name="use_flash">Use Flash</string>
+    <string name="barcode_success">Barcode read successfully</string>
+    <string name="barcode_failure">No barcode captured</string>
+    <string name="barcode_error">"Error reading barcode: %1$s"</string>
+    <string name="demo_message">"Source available on github"</string>
+    <string name="token">"NPSCLOUD access token"</string>
+    <string name="settings">"Settings"</string>
+    <string name="source">"Github"</string>
+    <string name="home">"Website"</string>
+    <string name="nps_lic">"NPS-LIC"</string>
+</resources>
