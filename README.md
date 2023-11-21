@@ -14,7 +14,7 @@ Introduction
 ------------
 [NP Tracker](http://www.nptracker.co.za) is run by [Number Plate Systems (Pty) Ltd](http://npscloud.co.za) and made this application source available to aid developers intergrating barcode reading and decoding.
 
-See the [API documentation](http://api.nptracker.co.za/docs/) for help and samples to use other NPS solutions in your projects.
+See the [API documentation](https://api.nptracker.co.za/docs/) and [WIKI pages](https://wiki.nptracker.co.za) for help and samples to use other NPS solutions in your projects.
 
 Pre-requisites
 --------------
